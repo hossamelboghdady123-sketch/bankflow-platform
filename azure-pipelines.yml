@@ -1,0 +1,28 @@
+trigger:
+  - main
+
+pool:
+  name: Default
+
+variables:
+  backendPath: 'backend/bankflow-api'
+
+steps:
+  - checkout: self
+
+  - script: |
+      set -e
+      cd "$(backendPath)"
+      chmod +x mvnw
+      ./mvnw test
+    displayName: 'Run Backend Tests'
+
+  - script: |
+      set -e
+      docker build -t bankflow-api:$(Build.BuildId) -t bankflow-api:latest ./backend/bankflow-api
+    displayName: 'Build Backend Docker Image'
+
+  - script: |
+      set -e
+      docker build -t bankflow-frontend:$(Build.BuildId) -t bankflow-frontend:latest ./frontend
+    displayName: 'Build Frontend Docker Image'
