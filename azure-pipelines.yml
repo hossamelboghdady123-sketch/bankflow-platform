@@ -84,6 +84,22 @@ steps:
         latest
 
   - script: |
+      set -euo pipefail
+
+      kind load docker-image "$(dockerHubUsername)/bankflow-api:$(Build.BuildId)" --name bankflow-local
+      kind load docker-image "$(dockerHubUsername)/bankflow-frontend:$(Build.BuildId)" --name bankflow-local
+
+      helm upgrade --install bankflow ./helm/bankflow \
+        --kube-context kind-bankflow-local \
+        --namespace bankflow \
+        --set backend.tag="$(Build.BuildId)" \
+        --set frontend.tag="$(Build.BuildId)"
+
+      kubectl --context kind-bankflow-local -n bankflow rollout status deployment/bankflow-api --timeout=180s
+      kubectl --context kind-bankflow-local -n bankflow rollout status deployment/bankflow-frontend --timeout=180s
+    displayName: 'Deploy BankFlow to local Kubernetes'
+
+  - script: |
       docker rm -f bankflow-ci-postgres 2>/dev/null || true
     displayName: 'Cleanup CI PostgreSQL'
     condition: always()

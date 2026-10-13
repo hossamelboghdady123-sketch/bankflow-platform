@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: bankflow-api
-          image: hossam789/bankflow-api:latest
+          image: {{ .Values.backend.image }}:{{ .Values.backend.tag | default "latest" }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

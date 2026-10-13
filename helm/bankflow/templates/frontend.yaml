@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: bankflow-frontend
-          image: hossam789/bankflow-frontend:latest
+          image: {{ .Values.frontend.image }}:{{ .Values.frontend.tag | default "latest" }}
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

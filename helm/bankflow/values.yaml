@@ -1,12 +1,14 @@
 namespace: bankflow
 
 backend:
-  image: hossam789/bankflow-api:latest
+  image: hossam789/bankflow-api
+  tag: "latest"
   replicas: 1
   port: 8080
 
 frontend:
-  image: hossam789/bankflow-frontend:latest
+  image: hossam789/bankflow-frontend
+  tag: "latest"
   replicas: 1
   port: 80
 
