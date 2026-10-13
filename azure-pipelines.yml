@@ -6,7 +6,7 @@ pool:
 
 variables:
   backendPath: 'backend/bankflow-api'
-  dockerHubConnection: 'docker'
+  dockerHubConnection: 'Docker Hub'
   dockerHubUsername: 'hossam789'
 
 steps:
