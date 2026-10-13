@@ -1,6 +1,7 @@
+
 services:
   bankflow-api:
-    image: bankflow-api:1.0
+    image: hossam789/bankflow-api:latest
     container_name: bankflow-api
     restart: unless-stopped
     environment:
@@ -11,7 +12,7 @@ services:
       - bankflow-network
 
   bankflow-frontend:
-    image: bankflow-frontend:1.0
+    image: hossam789/bankflow-frontend:latest
     container_name: bankflow-frontend
     restart: unless-stopped
     ports:

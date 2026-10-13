@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bankflow-api
+spec:
+  type: ClusterIP
+  selector:
+    app: bankflow-api
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bankflow-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bankflow-api
+  template:
+    metadata:
+      labels:
+        app: bankflow-api
+    spec:
+      containers:
+        - name: bankflow-api
+          image: hossam789/bankflow-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: BANKFLOW_DB_URL
+              value: jdbc:postgresql://bankflow-postgres:5432/bankflow
+            - name: BANKFLOW_DB_USERNAME
+              value: bankflow_app
+            - name: BANKFLOW_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bankflow-db
+                  key: password
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 12

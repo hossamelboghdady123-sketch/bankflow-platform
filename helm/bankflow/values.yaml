@@ -1,0 +1,18 @@
+namespace: bankflow
+
+backend:
+  image: hossam789/bankflow-api:latest
+  replicas: 1
+  port: 8080
+
+frontend:
+  image: hossam789/bankflow-frontend:latest
+  replicas: 1
+  port: 80
+
+database:
+  image: postgres:16
+  name: bankflow
+  username: bankflow_app
+  port: 5432
+  storage: 1Gi
