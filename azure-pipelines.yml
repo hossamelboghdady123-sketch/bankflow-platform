@@ -13,19 +13,16 @@ steps:
   - script: |
       set -e
       docker rm -f bankflow-ci-postgres 2>/dev/null || true
-      docker run -d 
-        --name bankflow-ci-postgres 
-        -e POSTGRES_DB=bankflow_test 
-        -e POSTGRES_USER=bankflow_app 
-        -e POSTGRES_PASSWORD=ci_test_password 
-        -p 127.0.0.1:5434:5432 
-        postgres:16
+      docker run -d --name bankflow-ci-postgres -e POSTGRES_DB=bankflow_test -e POSTGRES_USER=bankflow_app -e POSTGRES_PASSWORD=ci_test_password -p 127.0.0.1:5434:5432 postgres:16
+
       for i in $(seq 1 30); do
         if docker exec bankflow-ci-postgres pg_isready -U bankflow_app -d bankflow_test; then
+          echo "PostgreSQL is ready"
           exit 0
         fi
         sleep 2
       done
+
       docker logs bankflow-ci-postgres
       exit 1
     displayName: 'Start CI PostgreSQL'
