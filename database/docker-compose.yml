@@ -1,0 +1,21 @@
+services:
+  bankflow-postgres:
+    image: postgres:16
+    container_name: bankflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bankflow
+      POSTGRES_USER: bankflow_app
+      POSTGRES_PASSWORD: ${BANKFLOW_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - bankflow_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bankflow_app -d bankflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  bankflow_data:
