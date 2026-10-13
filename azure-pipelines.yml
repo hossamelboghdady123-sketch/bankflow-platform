@@ -12,10 +12,34 @@ steps:
 
   - script: |
       set -e
+      docker rm -f bankflow-ci-postgres 2>/dev/null || true
+      docker run -d 
+        --name bankflow-ci-postgres 
+        -e POSTGRES_DB=bankflow_test 
+        -e POSTGRES_USER=bankflow_app 
+        -e POSTGRES_PASSWORD=ci_test_password 
+        -p 127.0.0.1:5434:5432 
+        postgres:16
+      for i in $(seq 1 30); do
+        if docker exec bankflow-ci-postgres pg_isready -U bankflow_app -d bankflow_test; then
+          exit 0
+        fi
+        sleep 2
+      done
+      docker logs bankflow-ci-postgres
+      exit 1
+    displayName: 'Start CI PostgreSQL'
+
+  - script: |
+      set -e
       cd "$(backendPath)"
       chmod +x mvnw
       ./mvnw test
     displayName: 'Run Backend Tests'
+    env:
+      BANKFLOW_DB_URL: jdbc:postgresql://localhost:5434/bankflow_test
+      BANKFLOW_DB_USERNAME: bankflow_app
+      BANKFLOW_DB_PASSWORD: ci_test_password
 
   - script: |
       set -e
@@ -26,3 +50,8 @@ steps:
       set -e
       docker build -t bankflow-frontend:$(Build.BuildId) -t bankflow-frontend:latest ./frontend
     displayName: 'Build Frontend Docker Image'
+
+  - script: |
+      docker rm -f bankflow-ci-postgres 2>/dev/null || true
+    displayName: 'Cleanup CI PostgreSQL'
+    condition: always()
