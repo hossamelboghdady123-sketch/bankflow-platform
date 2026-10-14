@@ -1,0 +1,21 @@
+---
+- name: Verify BankFlow DevOps environment
+  hosts: local
+  gather_facts: true
+
+  tasks:
+    - name: Display operating system
+      ansible.builtin.debug:
+        msg: "BankFlow automation running on {{ ansible_distribution }}"
+
+    - name: Verify Git is installed
+      ansible.builtin.command: git --version
+      changed_when: false
+
+    - name: Verify Docker is installed
+      ansible.builtin.command: docker --version
+      changed_when: false
+
+    - name: Verify Terraform is installed
+      ansible.builtin.command: terraform -version
+      changed_when: false
