@@ -1,0 +1,47 @@
+services:
+  bankflow-postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bankflow
+      POSTGRES_USER: bankflow_app
+      POSTGRES_PASSWORD: ${BANKFLOW_DB_PASSWORD:?Set BANKFLOW_DB_PASSWORD}
+    volumes:
+      - bankflow_aws_data:/var/lib/postgresql/data
+    networks:
+      - bankflow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bankflow_app -d bankflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bankflow-api:
+    image: hossam789/bankflow-api:latest
+    restart: unless-stopped
+    environment:
+      BANKFLOW_DB_URL: jdbc:postgresql://bankflow-postgres:5432/bankflow
+      BANKFLOW_DB_USERNAME: bankflow_app
+      BANKFLOW_DB_PASSWORD: ${BANKFLOW_DB_PASSWORD:?Set BANKFLOW_DB_PASSWORD}
+    depends_on:
+      bankflow-postgres:
+        condition: service_healthy
+    networks:
+      - bankflow-network
+
+  bankflow-frontend:
+    image: hossam789/bankflow-frontend:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - bankflow-api
+    networks:
+      - bankflow-network
+
+networks:
+  bankflow-network:
+    driver: bridge
+
+volumes:
+  bankflow_aws_data:
