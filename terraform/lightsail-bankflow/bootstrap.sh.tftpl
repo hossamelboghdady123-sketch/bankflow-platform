@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euxo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y docker.io docker-compose-v2 git ca-certificates
+systemctl enable --now docker
+
+mkdir -p /opt/bankflow
+git clone --depth 1 https://github.com/hossamelboghdady123-sketch/bankflow-platform.git /opt/bankflow/repo
+
+cat > /opt/bankflow/repo/.env <<'ENVEOF'
+BANKFLOW_DB_PASSWORD=${db_password}
+ENVEOF
+
+chmod 600 /opt/bankflow/repo/.env
+cd /opt/bankflow/repo
+docker compose --env-file .env -f docker-compose.aws.yml pull
+docker compose --env-file .env -f docker-compose.aws.yml up -d
