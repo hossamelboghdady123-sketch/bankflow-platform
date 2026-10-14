@@ -13,6 +13,21 @@ steps:
   - checkout: self
 
   - script: |
+      set -euo pipefail
+      cd terraform
+      terraform fmt -check -recursive
+      terraform init -backend=false
+      terraform validate
+    displayName: 'Validate Terraform'
+
+  - script: |
+      set -euo pipefail
+      cd ansible
+      ansible-playbook --syntax-check playbooks/verify.yml
+      ansible-playbook playbooks/verify.yml
+    displayName: 'Validate Ansible'
+
+  - script: |
       set -e
       docker rm -f bankflow-ci-postgres 2>/dev/null || true
 
